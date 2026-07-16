@@ -21,24 +21,7 @@ const StatCard = ({ title, value, icon, gradient, delay }) => (
   </div>
 );
 
-// Dummy data for gorgeous charts since the API doesn't provide time-series yet
-const payrollData = [
-  { month: 'Jan', amount: 1200000 },
-  { month: 'Feb', amount: 1350000 },
-  { month: 'Mar', amount: 1250000 },
-  { month: 'Apr', amount: 1500000 },
-  { month: 'May', amount: 1650000 },
-  { month: 'Jun', amount: 1800000 },
-  { month: 'Jul', amount: 1750000 },
-];
-
-const siteData = [
-  { site: 'City Mall', employees: 45 },
-  { site: 'Downtown Office', employees: 85 },
-  { site: 'Central Hosp.', employees: 120 },
-  { site: 'Tech Park', employees: 95 },
-  { site: 'Airport T2', employees: 150 },
-];
+// Data will be fetched from API now
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -124,16 +107,25 @@ const Dashboard = () => {
         {/* Main Area Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-in fade-in slide-in-from-bottom-8" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-slate-800">Payroll Expenditure Trend</h3>
-            <span className="flex items-center text-emerald-500 text-sm font-semibold bg-emerald-50 px-2 py-1 rounded-md">
-              <TrendingUp size={14} className="mr-1" /> +12% this year
-            </span>
+            <h3 className="text-lg font-bold text-slate-800">Revenue vs Payroll Trend</h3>
+            <div className="flex space-x-4">
+              <span className="flex items-center text-emerald-500 text-sm font-semibold">
+                <span className="w-3 h-3 rounded-full bg-emerald-400 mr-2"></span> Revenue
+              </span>
+              <span className="flex items-center text-indigo-500 text-sm font-semibold">
+                <span className="w-3 h-3 rounded-full bg-indigo-400 mr-2"></span> Payroll
+              </span>
+            </div>
           </div>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={payrollData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={stats.trendData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorPayroll" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                   </linearGradient>
@@ -143,9 +135,10 @@ const Dashboard = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(val) => `₹${val/100000}L`} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                  formatter={(value) => [`₹ ${value.toLocaleString()}`, 'Payroll']}
+                  formatter={(value, name) => [`₹ ${parseFloat(value).toLocaleString()}`, name === 'revenue' ? 'Revenue' : 'Payroll']}
                 />
-                <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" />
+                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="payroll" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorPayroll)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -156,7 +149,7 @@ const Dashboard = () => {
           <h3 className="text-lg font-bold text-slate-800 mb-6">Workforce Distribution</h3>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={siteData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+              <BarChart data={stats.siteData || []} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
                 <XAxis type="number" hide />
                 <YAxis dataKey="site" type="category" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 12, fontWeight: 500 }} width={100} />

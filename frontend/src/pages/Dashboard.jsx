@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Briefcase, MapPin, IndianRupee, Loader, TrendingUp, Activity } from 'lucide-react';
+import { Users, Briefcase, MapPin, IndianRupee, Loader, TrendingUp, Activity, FileText } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import api from '../api/axios';
 

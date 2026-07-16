@@ -15,7 +15,11 @@ import MaterialMaster from './pages/SAP/MaterialMaster';
 import PurchaseOrder from './pages/SAP/PurchaseOrder';
 import GoodsReceipt from './pages/SAP/GoodsReceipt';
 import SalesOrder from './pages/SAP/SalesOrder';
-import Accounts from './pages/SAP/Accounts';
+import ChartOfAccounts from './pages/SAP/ChartOfAccounts';
+import GeneralLedger from './pages/SAP/GeneralLedger';
+import AccountsReceivable from './pages/SAP/AccountsReceivable';
+import AccountsPayable from './pages/SAP/AccountsPayable';
+import FixedAssets from './pages/SAP/FixedAssets';
 import WarehouseManagement from './pages/SAP/WarehouseManagement';
 import IDOCManagement from './pages/SAP/IDOCManagement';
 import Procurement from './pages/SAP/Procurement';
@@ -67,7 +71,11 @@ function App() {
           <Route path="sap/purchase-orders" element={<PurchaseOrder />} />
           <Route path="sap/goods-receipt" element={<GoodsReceipt />} />
           <Route path="sap/sales-orders" element={<SalesOrder />} />
-          <Route path="sap/accounts" element={<Accounts />} />
+          <Route path="sap/coa" element={<ChartOfAccounts />} />
+          <Route path="sap/gl" element={<GeneralLedger />} />
+          <Route path="sap/ar" element={<AccountsReceivable />} />
+          <Route path="sap/ap" element={<AccountsPayable />} />
+          <Route path="sap/assets" element={<FixedAssets />} />
           <Route path="sap/wm" element={<WarehouseManagement />} />
           <Route path="sap/idocs" element={<IDOCManagement />} />
           <Route path="sap/procurement" element={<Procurement />} />

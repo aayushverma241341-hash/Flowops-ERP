@@ -6,6 +6,7 @@ const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -158,7 +159,9 @@ const Employees = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
-              placeholder="Search employees..."
+              placeholder="Search employees by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
             />
           </div>
@@ -185,7 +188,9 @@ const Employees = () => {
                   <td colSpan="5" className="p-8 text-center text-gray-500">No employees found.</td>
                 </tr>
               ) : (
-                employees.map((emp) => (
+                employees
+                  .filter(emp => emp.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                  .map((emp) => (
                   <tr key={emp.employee_id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <td className="p-4 font-medium text-gray-900">{emp.name}</td>
                     <td className="p-4 text-gray-600">{emp.post}</td>

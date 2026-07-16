@@ -9,6 +9,9 @@ const WorkOrders = () => {
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [formData, setFormData] = useState({
     wo_no: '',
     issue_date: new Date().toISOString().split('T')[0],
@@ -40,6 +43,21 @@ const WorkOrders = () => {
       setFormData({ ...formData, copy_file: e.target.files[0] });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleViewWorkOrder = async (id) => {
+    setViewModalOpen(true);
+    setLoadingDetails(true);
+    try {
+      const response = await api.get(`/work-orders/${id}/full-details`);
+      setSelectedWorkOrder(response.data);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load work order details.');
+      setViewModalOpen(false);
+    } finally {
+      setLoadingDetails(false);
     }
   };
 
@@ -97,7 +115,7 @@ const WorkOrders = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((wo) => (
-            <div key={wo.wo_no} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow group cursor-pointer">
+            <div key={wo.wo_no} onClick={() => handleViewWorkOrder(wo.wo_no)} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow group cursor-pointer relative overflow-hidden">
               <div className="flex justify-between items-start mb-4">
                 <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-100 transition-colors">
                   <FileText size={24} />
@@ -160,6 +178,66 @@ const WorkOrders = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* View Work Order Modal */}
+      {viewModalOpen && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0">
+              <h2 className="text-lg font-bold text-gray-900">Work Order Details</h2>
+              <button onClick={() => setViewModalOpen(false)} className="text-gray-500 hover:text-gray-700">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              {loadingDetails ? (
+                <div className="text-center py-10 text-gray-500">Loading details...</div>
+              ) : selectedWorkOrder ? (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{selectedWorkOrder.wo_no}</h3>
+                    <p className="text-gray-500 mt-1">Issued: {new Date(selectedWorkOrder.issue_date).toLocaleDateString()}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-2">Description</h4>
+                    <div className="bg-gray-50 p-4 rounded-lg text-gray-800">
+                      {selectedWorkOrder.description}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-2">Associated Sites</h4>
+                    {selectedWorkOrder.sites && selectedWorkOrder.sites.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedWorkOrder.sites.map(site => (
+                          <div key={site.site_id} className="border border-gray-100 rounded-lg p-4 flex justify-between items-center bg-white shadow-sm">
+                            <div>
+                              <p className="font-bold text-gray-900">{site.site_name}</p>
+                              <p className="text-sm text-gray-500">{site.location || 'No location specified'}</p>
+                            </div>
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold">
+                              Active
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 bg-gray-50 p-4 rounded-lg text-center">No sites are assigned to this work order yet.</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-10 text-red-500">Failed to load.</div>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end flex-shrink-0">
+               <button onClick={() => setViewModalOpen(false)} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors">
+                 Close
+               </button>
+            </div>
           </div>
         </div>
       )}

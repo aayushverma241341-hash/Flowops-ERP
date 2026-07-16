@@ -1,89 +1,74 @@
+const { Pool } = require('pg');
 require('dotenv').config();
-const db = require('./config/db');
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+const migrationQuery = `
+CREATE TABLE IF NOT EXISTS fi_chart_of_accounts (
+    account_code VARCHAR(10) PRIMARY KEY,
+    account_name VARCHAR(255) NOT NULL,
+    account_group VARCHAR(50) NOT NULL,
+    statement_type VARCHAR(50) NOT NULL CHECK (statement_type IN ('Balance Sheet', 'P&L'))
+);
+
+CREATE TABLE IF NOT EXISTS fi_general_ledger (
+    id SERIAL PRIMARY KEY,
+    transaction_date DATE NOT NULL,
+    account_code VARCHAR(10) REFERENCES fi_chart_of_accounts(account_code),
+    document_type VARCHAR(10) NOT NULL,
+    reference VARCHAR(50),
+    debit_amount DECIMAL(15, 2) DEFAULT 0.00,
+    credit_amount DECIMAL(15, 2) DEFAULT 0.00,
+    text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS fi_accounts_receivable (
+    id SERIAL PRIMARY KEY,
+    customer_id VARCHAR(50) NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    invoice_no VARCHAR(50) UNIQUE NOT NULL,
+    doc_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    cleared_status VARCHAR(20) CHECK (cleared_status IN ('Open', 'Cleared')) DEFAULT 'Open'
+);
+
+CREATE TABLE IF NOT EXISTS fi_accounts_payable (
+    id SERIAL PRIMARY KEY,
+    vendor_id VARCHAR(50) NOT NULL,
+    vendor_name VARCHAR(255) NOT NULL,
+    invoice_no VARCHAR(50) UNIQUE NOT NULL,
+    doc_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    cleared_status VARCHAR(20) CHECK (cleared_status IN ('Open', 'Cleared')) DEFAULT 'Open'
+);
+
+CREATE TABLE IF NOT EXISTS fi_fixed_assets (
+    asset_id VARCHAR(20) PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    asset_class VARCHAR(50) NOT NULL,
+    purchase_date DATE NOT NULL,
+    acquisition_val DECIMAL(15, 2) NOT NULL,
+    accum_depreciation DECIMAL(15, 2) DEFAULT 0.00,
+    net_book_val DECIMAL(15, 2) NOT NULL
+);
+`;
 
 async function migrateFI() {
-  try {
-    console.log('Starting FI Migrations...');
-
-    // 1. Chart of Accounts (COA)
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS fi_chart_of_accounts (
-        id SERIAL PRIMARY KEY,
-        account_code VARCHAR(50) UNIQUE NOT NULL,
-        account_name VARCHAR(255) NOT NULL,
-        account_type VARCHAR(50) NOT NULL, -- Asset, Liability, Equity, Revenue, Expense
-        balance DECIMAL(15, 2) DEFAULT 0.00,
-        currency VARCHAR(10) DEFAULT 'INR',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('fi_chart_of_accounts table created');
-
-    // 2. Accounts Receivable (AR)
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS fi_accounts_receivable (
-        id SERIAL PRIMARY KEY,
-        invoice_number VARCHAR(100) UNIQUE NOT NULL,
-        customer_name VARCHAR(255) NOT NULL,
-        amount DECIMAL(15, 2) NOT NULL,
-        due_date DATE NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'Open', -- Open, Paid, Overdue
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('fi_accounts_receivable table created');
-
-    // 3. Accounts Payable (AP)
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS fi_accounts_payable (
-        id SERIAL PRIMARY KEY,
-        invoice_number VARCHAR(100) UNIQUE NOT NULL,
-        vendor_name VARCHAR(255) NOT NULL,
-        amount DECIMAL(15, 2) NOT NULL,
-        due_date DATE NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'Open', -- Open, Paid, Overdue
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('fi_accounts_payable table created');
-
-    // 4. General Ledger (GL)
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS fi_general_ledger (
-        id SERIAL PRIMARY KEY,
-        transaction_date DATE NOT NULL,
-        document_number VARCHAR(100) UNIQUE NOT NULL,
-        description TEXT,
-        account_code VARCHAR(50) REFERENCES fi_chart_of_accounts(account_code),
-        debit DECIMAL(15, 2) DEFAULT 0.00,
-        credit DECIMAL(15, 2) DEFAULT 0.00,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('fi_general_ledger table created');
-
-    // 5. Fixed Assets
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS fi_fixed_assets (
-        id SERIAL PRIMARY KEY,
-        asset_number VARCHAR(100) UNIQUE NOT NULL,
-        asset_name VARCHAR(255) NOT NULL,
-        asset_class VARCHAR(100),
-        purchase_date DATE NOT NULL,
-        purchase_value DECIMAL(15, 2) NOT NULL,
-        current_book_value DECIMAL(15, 2) NOT NULL,
-        status VARCHAR(50) DEFAULT 'Active', -- Active, Retired, Sold
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('fi_fixed_assets table created');
-
-    console.log('FI Migrations completed successfully.');
-  } catch (error) {
-    console.error('Error in FI Migrations:', error);
-  } finally {
-    process.exit();
-  }
+    try {
+        console.log("Creating FI tables...");
+        await pool.query(migrationQuery);
+        console.log("✅ FI tables created successfully!");
+        process.exit(0);
+    } catch (err) {
+        console.error("Error migrating FI tables:", err);
+        process.exit(1);
+    }
 }
 
 migrateFI();

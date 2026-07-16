@@ -4,7 +4,7 @@ try {
   execSync('git add .');
   
   console.log('Committing changes...');
-  execSync('git commit -m "Premium UI/UX Overhaul with Recharts"');
+  execSync('git commit -m "Build SAP FI Module Architecture (UI and DB Migration)"');
   
   console.log('Pushing to GitHub (Vercel will rebuild)...');
   execSync('git push');

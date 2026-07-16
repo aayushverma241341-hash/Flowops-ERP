@@ -57,13 +57,9 @@ const Layout = () => {
     },
     {
       title: 'Financial Accounting (FI)',
-      icon: <Landmark size={20} />,
+      icon: <CreditCard size={20} />,
       items: [
-        { label: 'Chart of Accounts', path: '/sap/coa' },
-        { label: 'General Ledger', path: '/sap/gl' },
-        { label: 'Accounts Receivable', path: '/sap/ar' },
-        { label: 'Accounts Payable', path: '/sap/ap' },
-        { label: 'Fixed Assets', path: '/sap/assets' }
+        { label: 'Accounts Center', path: '/sap/accounts' }
       ]
     },
     {

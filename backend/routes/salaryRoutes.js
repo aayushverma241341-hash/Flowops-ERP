@@ -11,6 +11,7 @@ router.get('/', salaryController.getAllSalaries);
 router.post('/process', roleMiddleware(['Admin', 'Accountant']), salaryController.processSalary);
 router.put('/:id/status', roleMiddleware(['Admin', 'Accountant']), salaryController.updateSalaryStatus);
 
+router.get('/:id', salaryController.getSalary);
 router.get('/:id/print', salaryController.printPayslip);
 
 module.exports = router;

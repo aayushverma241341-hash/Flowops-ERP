@@ -11,6 +11,7 @@ router.get('/', billingController.getAllInvoices);
 router.post('/create', roleMiddleware(['Admin', 'Accountant']), billingController.createInvoice);
 router.put('/:id/status', roleMiddleware(['Admin', 'Accountant']), billingController.updateInvoiceStatus);
 
+router.get('/:id', billingController.getInvoice);
 router.get('/:id/print', billingController.printInvoice);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Download, AlertCircle, X, Trash2, Edit } from 'lucide-react';
 import api from '../api/axios';
+import { generateInvoicePDF } from '../utils/pdfGenerator';
 
 const Billing = () => {
   const [invoices, setInvoices] = useState([]);
@@ -136,13 +137,12 @@ const Billing = () => {
 
   const handlePrint = async (invoice_id) => {
     try {
-      const response = await api.get(`/billing/${invoice_id}/print`);
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(response.data);
-      printWindow.document.close();
+      const response = await api.get(`/billing/${invoice_id}`);
+      const { invoice, details } = response.data;
+      generateInvoicePDF(invoice, details);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate invoice');
+      alert('Failed to generate invoice PDF');
     }
   };
 

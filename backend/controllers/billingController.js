@@ -69,6 +69,35 @@ exports.updateInvoiceStatus = async (req, res) => {
     }
 };
 
+exports.getInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const invResult = await db.query(`
+            SELECT i.*, w.description as wo_description, s.site_name 
+            FROM invoices i
+            LEFT JOIN work_orders w ON i.wo_no = w.wo_no
+            LEFT JOIN sites s ON i.site_id = s.site_id
+            WHERE i.invoice_id = $1
+        `, [id]);
+
+        if (invResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+
+        const detailsResult = await db.query(`
+            SELECT * FROM invoice_details WHERE invoice_id = $1
+        `, [id]);
+
+        res.json({
+            invoice: invResult.rows[0],
+            details: detailsResult.rows
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 exports.printInvoice = async (req, res) => {
     try {
         const { id } = req.params;

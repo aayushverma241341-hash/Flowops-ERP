@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { IndianRupee, Printer, AlertCircle, Plus, X, Edit } from 'lucide-react';
+import { IndianRupee, Printer, AlertCircle, Plus, X, Edit, Download } from 'lucide-react';
 import api from '../api/axios';
+import { generateSalarySlipPDF } from '../utils/pdfGenerator';
 
 const Salary = () => {
   const [salaries, setSalaries] = useState([]);
@@ -125,13 +126,12 @@ const Salary = () => {
 
   const handlePrint = async (salary_id) => {
     try {
-      const response = await api.get(`/salary/${salary_id}/print`);
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(response.data);
-      printWindow.document.close();
+      const response = await api.get(`/salary/${salary_id}`);
+      const { salary, employee } = response.data;
+      generateSalarySlipPDF(salary, employee);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate payslip');
+      alert('Failed to generate payslip PDF');
     }
   };
 
@@ -220,8 +220,8 @@ const Salary = () => {
                     >
                       <Edit size={18} />
                     </button>
-                    <button onClick={() => handlePrint(sal.salary_id)} className="text-gray-400 hover:text-amber-600 transition-colors p-2 rounded-lg hover:bg-amber-50" title="Print Payslip">
-                      <Printer size={18} />
+                    <button onClick={() => handlePrint(sal.salary_id)} className="text-gray-400 hover:text-amber-600 transition-colors p-2 rounded-lg hover:bg-amber-50" title="Download Payslip PDF">
+                      <Download size={18} />
                     </button>
                   </td>
                 </tr>

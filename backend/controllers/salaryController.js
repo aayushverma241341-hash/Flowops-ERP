@@ -86,6 +86,36 @@ exports.getAllSalaries = async (req, res) => {
     }
 };
 
+exports.getSalary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await db.query(`
+            SELECT s.*, e.name as employee_name, e.email as employee_email, e.role as employee_role, e.created_at as employee_created_at, e.post, e.category 
+            FROM salaries s
+            JOIN employees e ON s.employee_id = e.employee_id
+            WHERE s.salary_id = $1
+        `, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Salary not found' });
+        }
+
+        const sal = result.rows[0];
+        res.json({
+            salary: sal,
+            employee: {
+                name: sal.employee_name,
+                email: sal.employee_email,
+                role: sal.employee_role,
+                created_at: sal.employee_created_at
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 exports.printPayslip = async (req, res) => {
     try {
         const { id } = req.params;

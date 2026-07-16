@@ -4,7 +4,7 @@ try {
   execSync('git add .');
   
   console.log('Committing changes...');
-  execSync('git commit -m "Force deploy: Work Orders popup and Employees search fix"');
+  execSync('git commit -m "Premium UI/UX Overhaul with Recharts"');
   
   console.log('Pushing to GitHub (Vercel will rebuild)...');
   execSync('git push');

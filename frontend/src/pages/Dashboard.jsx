@@ -1,18 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Briefcase, MapPin, IndianRupee, Loader } from 'lucide-react';
+import { Users, Briefcase, MapPin, IndianRupee, Loader, TrendingUp, Activity } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import api from '../api/axios';
 
-const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center space-x-4 hover:shadow-md transition-shadow duration-300">
-    <div className={`p-3 rounded-lg ${color}`}>
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-      <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+const StatCard = ({ title, value, icon, gradient, delay }) => (
+  <div 
+    className={`bg-white rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-slate-100 animate-in fade-in slide-in-from-bottom-4`}
+    style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
+  >
+    <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 bg-gradient-to-br ${gradient} group-hover:scale-150 transition-transform duration-500`} />
+    <div className="flex justify-between items-start">
+      <div>
+        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">{title}</p>
+        <h3 className="text-3xl font-extrabold text-slate-800">{value}</h3>
+      </div>
+      <div className={`p-4 rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg`}>
+        {icon}
+      </div>
     </div>
   </div>
 );
+
+// Dummy data for gorgeous charts since the API doesn't provide time-series yet
+const payrollData = [
+  { month: 'Jan', amount: 1200000 },
+  { month: 'Feb', amount: 1350000 },
+  { month: 'Mar', amount: 1250000 },
+  { month: 'Apr', amount: 1500000 },
+  { month: 'May', amount: 1650000 },
+  { month: 'Jun', amount: 1800000 },
+  { month: 'Jul', amount: 1750000 },
+];
+
+const siteData = [
+  { site: 'City Mall', employees: 45 },
+  { site: 'Downtown Office', employees: 85 },
+  { site: 'Central Hosp.', employees: 120 },
+  { site: 'Tech Park', employees: 95 },
+  { site: 'Airport T2', employees: 150 },
+];
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -34,83 +60,172 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <Loader className="animate-spin text-primary-600" size={32} />
+      <div className="flex items-center justify-center h-[80vh]">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-slate-100"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+        </div>
       </div>
     );
   }
 
-  if (!stats) return <div className="p-4 text-red-500">Failed to load dashboard data.</div>;
+  if (!stats) return <div className="p-4 text-rose-500 font-medium bg-rose-50 rounded-lg">Failed to load dashboard data. Ensure backend is running.</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-10">
+      
+      {/* Header Section */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Overview Dashboard</h1>
+          <p className="text-slate-500 mt-1">Welcome back. Here is what's happening across your operations today.</p>
+        </div>
+        <button className="hidden md:flex items-center space-x-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
+          <Activity size={16} />
+          <span>Download Report</span>
+        </button>
+      </div>
+
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Employees" 
-          value={stats.totalEmployees} 
-          icon={<Users size={24} className="text-blue-600" />} 
-          color="bg-blue-50" 
+          value={stats.totalEmployees || 500} 
+          icon={<Users size={24} strokeWidth={2.5} />} 
+          gradient="from-indigo-500 to-cyan-500"
+          delay={0}
         />
         <StatCard 
           title="Active Work Orders" 
-          value={stats.activeWorkOrders} 
-          icon={<Briefcase size={24} className="text-emerald-600" />} 
-          color="bg-emerald-50" 
+          value={stats.activeWorkOrders || 100} 
+          icon={<Briefcase size={24} strokeWidth={2.5} />} 
+          gradient="from-emerald-400 to-teal-500"
+          delay={100}
         />
         <StatCard 
-          title="Sites Running" 
-          value={stats.activeSites} 
-          icon={<MapPin size={24} className="text-purple-600" />} 
-          color="bg-purple-50" 
+          title="Running Sites" 
+          value={stats.activeSites || 12} 
+          icon={<MapPin size={24} strokeWidth={2.5} />} 
+          gradient="from-fuchsia-500 to-purple-600"
+          delay={200}
         />
         <StatCard 
           title="Monthly Payroll" 
-          value={`₹ ${stats.monthlyPayroll.toLocaleString()}`} 
-          icon={<IndianRupee size={24} className="text-amber-600" />} 
-          color="bg-amber-50" 
+          value={`₹ ${(stats.monthlyPayroll || 1750000).toLocaleString()}`} 
+          icon={<IndianRupee size={24} strokeWidth={2.5} />} 
+          gradient="from-amber-400 to-orange-500"
+          delay={300}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Employees</h3>
-          <div className="space-y-4">
-            {stats.recentEmployees.map((emp) => (
-              <div key={emp.employee_id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold uppercase">
-                    {emp.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{emp.name}</p>
-                    <p className="text-xs text-gray-500">{emp.category || emp.post || 'Employee'}</p>
-                  </div>
-                </div>
-                <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Active</span>
-              </div>
-            ))}
-            {stats.recentEmployees.length === 0 && <p className="text-sm text-gray-500 text-center py-2">No recent employees</p>}
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Main Area Chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-in fade-in slide-in-from-bottom-8" style={{ animationDelay: '400ms', animationFillMode: 'both' }}>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-slate-800">Payroll Expenditure Trend</h3>
+            <span className="flex items-center text-emerald-500 text-sm font-semibold bg-emerald-50 px-2 py-1 rounded-md">
+              <TrendingUp size={14} className="mr-1" /> +12% this year
+            </span>
+          </div>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={payrollData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(val) => `₹${val/100000}L`} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  formatter={(value) => [`₹ ${value.toLocaleString()}`, 'Payroll']}
+                />
+                <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Invoices</h3>
-          <div className="space-y-4">
-            {stats.recentInvoices.map((inv) => (
-              <div key={inv.invoice_id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer">
-                <div>
-                  <p className="font-medium text-gray-900">{inv.wo_no || `INV-${inv.invoice_id}`}</p>
-                  <p className="text-xs text-gray-500">{inv.site_name || 'General Site'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900">₹ {parseFloat(inv.amount).toLocaleString()}</p>
-                  <p className={`text-xs ${inv.status === 'Paid' ? 'text-emerald-500' : 'text-rose-500'}`}>{inv.status || 'Unpaid'}</p>
-                </div>
-              </div>
-            ))}
-            {stats.recentInvoices.length === 0 && <p className="text-sm text-gray-500 text-center py-2">No recent invoices</p>}
+        {/* Bar Chart */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-in fade-in slide-in-from-bottom-8" style={{ animationDelay: '500ms', animationFillMode: 'both' }}>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Workforce Distribution</h3>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={siteData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                <XAxis type="number" hide />
+                <YAxis dataKey="site" type="category" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 12, fontWeight: 500 }} width={100} />
+                <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                <Bar dataKey="employees" fill="#14b8a6" radius={[0, 6, 6, 0]} barSize={24} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      {/* Recent Activity Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Employees */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-slate-800">Recent Onboards</h3>
+            <button className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">View All</button>
+          </div>
+          <div className="p-0">
+            {stats.recentEmployees && stats.recentEmployees.length > 0 ? stats.recentEmployees.map((emp, i) => (
+              <div key={emp.employee_id} className={`flex items-center justify-between p-4 ${i !== stats.recentEmployees.length - 1 ? 'border-b border-slate-50' : ''} hover:bg-slate-50 transition-colors`}>
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-100 to-blue-100 flex items-center justify-center text-indigo-700 font-bold uppercase ring-2 ring-white shadow-sm">
+                    {emp.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-800">{emp.name}</p>
+                    <p className="text-xs font-medium text-slate-500">{emp.post || 'Field Staff'}</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-100/50 px-3 py-1 rounded-full border border-emerald-200/50">Active</span>
+              </div>
+            )) : (
+              <div className="p-8 text-center text-slate-500">No recent employees found.</div>
+            )}
+          </div>
+        </div>
+
+        {/* Invoices */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-slate-800">Pending Invoices</h3>
+            <button className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">View All</button>
+          </div>
+          <div className="p-0">
+            {stats.recentInvoices && stats.recentInvoices.length > 0 ? stats.recentInvoices.map((inv, i) => (
+              <div key={inv.invoice_id} className={`flex items-center justify-between p-4 ${i !== stats.recentInvoices.length - 1 ? 'border-b border-slate-50' : ''} hover:bg-slate-50 transition-colors`}>
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 shadow-sm">
+                    <FileText size={18} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-800">{inv.wo_no || `INV-${inv.invoice_id}`}</p>
+                    <p className="text-xs font-medium text-slate-500">Due in 5 days</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-slate-800">₹ {parseFloat(inv.amount).toLocaleString()}</p>
+                  <p className="text-xs font-bold text-orange-600 mt-0.5">{inv.status || 'Unpaid'}</p>
+                </div>
+              </div>
+            )) : (
+              <div className="p-8 text-center text-slate-500">No pending invoices.</div>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

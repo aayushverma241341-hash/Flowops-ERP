@@ -7,10 +7,12 @@ import {
   Settings, FolderKanban, ShieldCheck, CreditCard, Receipt
 } from 'lucide-react';
 import SmartChat from './SmartChat';
+import CommandPalette from './CommandPalette';
 
 const Layout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState({
     'Dashboard': true,
     'HR & Operations': false,
@@ -33,6 +35,18 @@ const Layout = () => {
         console.error('Error parsing user from localStorage', e);
       }
     }
+  }, []);
+
+  // Listen for global Cmd+K to open Command Palette
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const menuGroups = [
@@ -233,14 +247,14 @@ const Layout = () => {
           </div>
 
           <div className="flex items-center space-x-6">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search T-codes (e.g., ME21N)..." 
-                className="pl-10 pr-4 py-2 border border-slate-300 rounded-full text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50"
-              />
-            </div>
+            <button 
+              onClick={() => setCommandPaletteOpen(true)}
+              className="hidden md:flex items-center space-x-2 bg-slate-50 border border-slate-200/60 px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:bg-slate-100 transition-colors w-64 group"
+            >
+              <Search size={16} className="group-hover:text-slate-600 transition-colors" />
+              <span className="flex-1 text-left group-hover:text-slate-600 transition-colors">Search anything...</span>
+              <kbd className="bg-white px-2 py-0.5 rounded shadow-sm border border-slate-200 font-sans text-xs font-semibold text-slate-500">⌘K</kbd>
+            </button>
             <button className="relative text-slate-500 hover:text-indigo-600 transition-colors">
               <Bell size={20} />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -258,6 +272,12 @@ const Layout = () => {
       
       {/* Next-Gen AI Database Agent */}
       <SmartChat />
+
+      {/* Command Palette Modal */}
+      <CommandPalette 
+        isOpen={commandPaletteOpen} 
+        onClose={() => setCommandPaletteOpen(false)} 
+      />
     </div>
   );
 };

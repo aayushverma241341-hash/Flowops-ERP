@@ -31,11 +31,11 @@ const DataTable = ({
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-300">
+    <div className="bg-white rounded-xl shadow-soft overflow-hidden animate-in fade-in duration-300">
       
       {/* Table Header/Toolbar */}
       {searchable && (
-        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
@@ -73,25 +73,28 @@ const DataTable = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
+              <tr className="border-b border-slate-100">
                 {columns.map((col, idx) => (
                   <th 
                     key={idx} 
-                    className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap"
+                    className="px-6 py-5 text-xs font-semibold text-slate-400 tracking-tight whitespace-nowrap"
                   >
-                    <div className="flex items-center space-x-1 cursor-pointer hover:text-slate-800">
+                    <div className="flex items-center space-x-1 cursor-pointer hover:text-slate-600 transition-colors">
                       <span>{col.header}</span>
-                      <ArrowUpDown size={14} className="opacity-50" />
+                      <ArrowUpDown size={14} className="opacity-40" />
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-50">
               {currentData.map((row, rIdx) => (
-                <tr key={rIdx} className="hover:bg-slate-50/80 transition-colors">
+                <tr key={rIdx} className="group hover:bg-slate-50/50 transition-colors duration-200">
                   {columns.map((col, cIdx) => (
-                    <td key={cIdx} className="px-6 py-4 text-sm text-slate-600 whitespace-nowrap">
+                    <td 
+                      key={cIdx} 
+                      className={`px-6 py-4 text-sm text-slate-700 whitespace-nowrap ${col.header === 'Actions' ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-200' : ''}`}
+                    >
                       {col.cell ? col.cell(row) : row[col.accessor]}
                     </td>
                   ))}
@@ -104,7 +107,7 @@ const DataTable = ({
 
       {/* Pagination Footer */}
       {filteredData.length > 0 && (
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white">
           <div className="text-sm text-slate-500">
             Page <span className="font-semibold text-slate-700">{currentPage}</span> of <span className="font-semibold text-slate-700">{totalPages || 1}</span>
           </div>

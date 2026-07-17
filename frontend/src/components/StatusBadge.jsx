@@ -7,25 +7,28 @@ const StatusBadge = ({ status }) => {
       case 'paid':
       case 'completed':
       case 'present':
-        return 'text-emerald-700 bg-emerald-100/50 border-emerald-200/50';
+        return { bg: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' };
       case 'pending':
       case 'unpaid':
       case 'in progress':
       case 'warning':
-        return 'text-amber-700 bg-amber-100/50 border-amber-200/50';
+        return { bg: 'bg-amber-50 text-amber-700', dot: 'bg-amber-500' };
       case 'error':
       case 'inactive':
       case 'cancelled':
       case 'absent':
-        return 'text-rose-700 bg-rose-100/50 border-rose-200/50';
+        return { bg: 'bg-rose-50 text-rose-700', dot: 'bg-rose-500' };
       default:
-        return 'text-slate-700 bg-slate-100/50 border-slate-200/50';
+        return { bg: 'bg-slate-50 text-slate-700', dot: 'bg-slate-400' };
     }
   };
 
+  const style = getBadgeStyle(status);
+
   return (
-    <span className={`text-xs font-bold px-3 py-1 rounded-full border ${getBadgeStyle(status)}`}>
-      {status || 'Unknown'}
+    <span className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${style.bg}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`}></span>
+      <span>{status || 'Unknown'}</span>
     </span>
   );
 };

@@ -1,130 +1,99 @@
 import React, { useState } from 'react';
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react';
-import EmptyState from './EmptyState';
+import { Search, ChevronDown, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 
-const DataTable = ({ 
-  columns, 
-  data, 
-  searchPlaceholder = "Search records...", 
-  searchable = true,
-  emptyStateTitle,
-  emptyStateDesc,
-  onEmptyAction,
-  emptyActionLabel
-}) => {
+const DataTable = ({ columns, data, searchable = true, emptyStateTitle = "No Data", emptyStateAction }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-  
-  // Basic Search Filtering (checks all string values in a row)
+
   const filteredData = data.filter(row => 
     Object.values(row).some(val => 
       String(val).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const currentData = filteredData.slice(
     (currentPage - 1) * rowsPerPage, 
     currentPage * rowsPerPage
   );
 
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-48 flex flex-col items-center justify-center bg-white border border-slate-100 border-dashed rounded-2xl">
+        <FileText size={32} className="text-slate-300 mb-3" />
+        <p className="text-slate-500 font-medium">{emptyStateTitle}</p>
+        {emptyStateAction && (
+          <button 
+            onClick={emptyStateAction.onClick}
+            className="mt-4 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
+          >
+            {emptyStateAction.label}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-soft overflow-hidden animate-in fade-in duration-300">
-      
-      {/* Table Header/Toolbar */}
+    <div className="bg-white border border-slate-200/60 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-hidden">
       {searchable && (
-        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
-          <div className="relative">
+        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
               type="text" 
-              placeholder={searchPlaceholder}
+              placeholder="Search records..." 
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset page on search
-              }}
-              className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white shadow-sm"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
             />
           </div>
-          <div className="text-sm text-slate-500">
-            Showing <span className="font-semibold text-slate-700">{filteredData.length}</span> records
-          </div>
         </div>
       )}
-
-      {/* Table Content */}
-      {data.length === 0 ? (
-        <div className="p-6">
-          <EmptyState 
-            title={emptyStateTitle} 
-            description={emptyStateDesc}
-            actionLabel={emptyActionLabel}
-            onAction={onEmptyAction}
-          />
-        </div>
-      ) : filteredData.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 text-sm">
-          No records match your search "<strong>{searchTerm}</strong>".
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100">
-                {columns.map((col, idx) => (
-                  <th 
-                    key={idx} 
-                    className="px-6 py-5 text-xs font-semibold text-slate-400 tracking-tight whitespace-nowrap"
-                  >
-                    <div className="flex items-center space-x-1 cursor-pointer hover:text-slate-600 transition-colors">
-                      <span>{col.header}</span>
-                      <ArrowUpDown size={14} className="opacity-40" />
-                    </div>
-                  </th>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-slate-50/80 border-b border-slate-100">
+              {columns.map((col, i) => (
+                <th key={i} className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {col.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {currentData.map((row, i) => (
+              <tr key={i} className="hover:bg-slate-50/50 transition-colors group">
+                {columns.map((col, j) => (
+                  <td key={j} className="px-6 py-4 text-sm text-slate-600">
+                    {col.cell ? col.cell(row) : row[col.accessor]}
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {currentData.map((row, rIdx) => (
-                <tr key={rIdx} className="group hover:bg-slate-50/50 transition-colors duration-200">
-                  {columns.map((col, cIdx) => (
-                    <td 
-                      key={cIdx} 
-                      className={`px-6 py-4 text-sm text-slate-700 whitespace-nowrap ${col.header === 'Actions' ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-200' : ''}`}
-                    >
-                      {col.cell ? col.cell(row) : row[col.accessor]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Pagination Footer */}
-      {filteredData.length > 0 && (
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white">
-          <div className="text-sm text-slate-500">
-            Page <span className="font-semibold text-slate-700">{currentPage}</span> of <span className="font-semibold text-slate-700">{totalPages || 1}</span>
-          </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {totalPages > 1 && (
+        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <span className="text-sm text-slate-500">
+            Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length}
+          </span>
           <div className="flex space-x-2">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 rounded-md text-slate-400 hover:text-slate-600 disabled:opacity-50 transition-colors"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={20} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentPage === totalPages}
+              className="p-1 rounded-md text-slate-400 hover:text-slate-600 disabled:opacity-50 transition-colors"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>

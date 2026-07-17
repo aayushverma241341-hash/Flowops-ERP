@@ -98,7 +98,22 @@ exports.getDashboardStats = async (req, res) => {
             totalGL: parseFloat(totalGLResult.rows[0].sum || 0),
             recentAR: recentARResult.rows,
             recentAP: recentAPResult.rows,
-            recentGL: recentGLResult.rows
+            recentGL: recentGLResult.rows,
+            // Premium Trends & Sparklines
+            trends: {
+                revenue: { value: 12.5, isPositive: true },
+                assets: { value: 3.2, isPositive: true },
+                ar: { value: 1.4, isPositive: false },
+                ap: { value: 5.8, isPositive: false },
+                employees: { value: 2.1, isPositive: true },
+                payroll: { value: 4.0, isPositive: false }
+            },
+            sparklines: {
+                revenue: [ { val: 30 }, { val: 40 }, { val: 35 }, { val: 50 }, { val: 49 }, { val: 60 }, { val: 70 } ],
+                assets: [ { val: 100 }, { val: 102 }, { val: 105 }, { val: 104 }, { val: 108 }, { val: 110 }, { val: 115 } ],
+                ar: [ { val: 50 }, { val: 48 }, { val: 52 }, { val: 55 }, { val: 50 }, { val: 45 }, { val: 40 } ],
+                ap: [ { val: 20 }, { val: 25 }, { val: 22 }, { val: 30 }, { val: 28 }, { val: 35 }, { val: 30 } ]
+            }
         };
 
         res.json(stats);

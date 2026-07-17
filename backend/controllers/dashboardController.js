@@ -14,7 +14,13 @@ exports.getDashboardStats = async (req, res) => {
             siteDataResult,
             totalRevenueResult,
             pendingReceivablesResult,
-            todayAttendanceResult
+            todayAttendanceResult,
+            totalARResult,
+            totalAPResult,
+            recentARResult,
+            recentAPResult,
+            totalGLResult,
+            recentGLResult
         ] = await Promise.all([
             db.query('SELECT COUNT(*) FROM employees'),
             db.query('SELECT COUNT(*) FROM work_orders WHERE end_date IS NULL OR end_date >= CURRENT_DATE'),
@@ -66,7 +72,13 @@ exports.getDashboardStats = async (req, res) => {
             `),
             db.query('SELECT SUM(amount) FROM invoices'),
             db.query('SELECT SUM(amount) FROM invoices WHERE status = $1 OR status = $2', ['Unpaid', 'Pending']),
-            db.query('SELECT COUNT(*) FROM attendance WHERE date = CURRENT_DATE AND status = $1', ['Present'])
+            db.query('SELECT COUNT(*) FROM attendance WHERE date = CURRENT_DATE AND status = $1', ['Present']),
+            db.query('SELECT SUM(amount) FROM fi_accounts_receivable WHERE cleared_status = $1', ['Open']),
+            db.query('SELECT SUM(amount) FROM fi_accounts_payable WHERE cleared_status = $1', ['Open']),
+            db.query('SELECT * FROM fi_accounts_receivable ORDER BY doc_date DESC LIMIT 4'),
+            db.query('SELECT * FROM fi_accounts_payable ORDER BY doc_date DESC LIMIT 4'),
+            db.query('SELECT SUM(debit_amount) FROM fi_general_ledger'),
+            db.query('SELECT * FROM fi_general_ledger ORDER BY transaction_date DESC LIMIT 4')
         ]);
 
         const stats = {
@@ -80,7 +92,13 @@ exports.getDashboardStats = async (req, res) => {
             siteData: siteDataResult ? siteDataResult.rows : [],
             totalRevenue: parseFloat(totalRevenueResult.rows[0].sum || 0),
             pendingReceivables: parseFloat(pendingReceivablesResult.rows[0].sum || 0),
-            todayAttendance: parseInt(todayAttendanceResult.rows[0].count, 10)
+            todayAttendance: parseInt(todayAttendanceResult.rows[0].count, 10),
+            totalAR: parseFloat(totalARResult.rows[0].sum || 0),
+            totalAP: parseFloat(totalAPResult.rows[0].sum || 0),
+            totalGL: parseFloat(totalGLResult.rows[0].sum || 0),
+            recentAR: recentARResult.rows,
+            recentAP: recentAPResult.rows,
+            recentGL: recentGLResult.rows
         };
 
         res.json(stats);

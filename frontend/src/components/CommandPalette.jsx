@@ -18,7 +18,11 @@ const CommandPalette = ({ isOpen, onClose }) => {
     { id: 'po', title: 'Purchase Orders', path: '/sap/purchase-orders', icon: Package, category: 'MM' },
     { id: 'inventory', title: 'Inventory (GR/GI)', path: '/sap/inventory', icon: Package, category: 'MM' },
     { id: 'sales', title: 'Sales Orders', path: '/sap/sales-orders', icon: Package, category: 'SD' },
-    { id: 'accounts', title: 'Accounts Center (FI)', path: '/sap/accounts', icon: Layers, category: 'FI' },
+    { id: 'ar', title: 'Accounts Receivable', path: '/sap/ar', icon: Layers, category: 'FI' },
+    { id: 'ap', title: 'Accounts Payable', path: '/sap/ap', icon: Layers, category: 'FI' },
+    { id: 'gl', title: 'General Ledger', path: '/sap/gl', icon: Layers, category: 'FI' },
+    { id: 'coa', title: 'Chart of Accounts', path: '/sap/coa', icon: Layers, category: 'FI' },
+    { id: 'fa', title: 'Fixed Assets', path: '/sap/fa', icon: Layers, category: 'FI' },
     { id: 'users', title: 'User Management', path: '/users', icon: Settings, category: 'Admin' },
   ];
 

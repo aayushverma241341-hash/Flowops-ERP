@@ -39,10 +39,10 @@ exports.getDashboardStats = async (req, res) => {
                     GROUP BY 1
                 ),
                 monthly_payroll AS (
-                    SELECT month, SUM(net_salary) as payroll
+                    SELECT to_char(to_date(month, 'FMMonth YYYY'), 'Mon YYYY') as month, 
+                           SUM(net_salary) as payroll
                     FROM salaries
-                    -- Since salaries table has month as 'Month YYYY', we can just match it
-                    GROUP BY month
+                    GROUP BY 1
                 )
                 SELECT m.month, 
                        COALESCE(r.revenue, 0) as revenue,

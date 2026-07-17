@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Briefcase, MapPin, IndianRupee, Loader, TrendingUp, Activity, FileText } from 'lucide-react';
+import { Users, Briefcase, MapPin, IndianRupee, Loader, TrendingUp, Activity, FileText, CheckCircle } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import api from '../api/axios';
 
 import StatCard from '../components/StatCard';
+import DataTable from '../components/DataTable';
+import StatusBadge from '../components/StatusBadge';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -54,32 +56,53 @@ const Dashboard = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
-          title="Total Employees" 
-          value={stats.totalEmployees || 500} 
-          icon={<Users size={24} strokeWidth={2.5} />} 
-          gradient="from-indigo-500 to-cyan-500"
+          title="Total Revenue" 
+          value={`₹ ${(stats.totalRevenue || 0).toLocaleString()}`} 
+          icon={<TrendingUp size={24} strokeWidth={2.5} />} 
+          gradient="from-emerald-500 to-teal-500"
           delay={0}
         />
         <StatCard 
-          title="Active Work Orders" 
-          value={stats.activeWorkOrders || 100} 
-          icon={<Briefcase size={24} strokeWidth={2.5} />} 
-          gradient="from-emerald-400 to-teal-500"
+          title="Pending Receivables" 
+          value={`₹ ${(stats.pendingReceivables || 0).toLocaleString()}`} 
+          icon={<IndianRupee size={24} strokeWidth={2.5} />} 
+          gradient="from-rose-400 to-red-500"
           delay={100}
         />
         <StatCard 
-          title="Running Sites" 
-          value={stats.activeSites || 12} 
-          icon={<MapPin size={24} strokeWidth={2.5} />} 
-          gradient="from-fuchsia-500 to-purple-600"
+          title="Total Employees" 
+          value={stats.totalEmployees || 0} 
+          icon={<Users size={24} strokeWidth={2.5} />} 
+          gradient="from-indigo-500 to-cyan-500"
           delay={200}
         />
         <StatCard 
+          title="Attendance Today" 
+          value={stats.todayAttendance || 0} 
+          icon={<CheckCircle size={24} strokeWidth={2.5} />} 
+          gradient="from-blue-400 to-indigo-500"
+          delay={300}
+        />
+        <StatCard 
           title="Monthly Payroll" 
-          value={`₹ ${(stats.monthlyPayroll || 1750000).toLocaleString()}`} 
+          value={`₹ ${(stats.monthlyPayroll || 0).toLocaleString()}`} 
           icon={<IndianRupee size={24} strokeWidth={2.5} />} 
           gradient="from-amber-400 to-orange-500"
-          delay={300}
+          delay={400}
+        />
+        <StatCard 
+          title="Active Work Orders" 
+          value={stats.activeWorkOrders || 0} 
+          icon={<Briefcase size={24} strokeWidth={2.5} />} 
+          gradient="from-fuchsia-500 to-purple-600"
+          delay={500}
+        />
+        <StatCard 
+          title="Running Sites" 
+          value={stats.activeSites || 0} 
+          icon={<MapPin size={24} strokeWidth={2.5} />} 
+          gradient="from-slate-600 to-slate-800"
+          delay={600}
         />
       </div>
 
@@ -147,58 +170,33 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Employees */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-slate-800">Recent Onboards</h3>
-            <button className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">View All</button>
-          </div>
-          <div className="p-0">
-            {stats.recentEmployees && stats.recentEmployees.length > 0 ? stats.recentEmployees.map((emp, i) => (
-              <div key={emp.employee_id} className={`flex items-center justify-between p-4 ${i !== stats.recentEmployees.length - 1 ? 'border-b border-slate-50' : ''} hover:bg-slate-50 transition-colors`}>
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-100 to-blue-100 flex items-center justify-center text-indigo-700 font-bold uppercase ring-2 ring-white shadow-sm">
-                    {emp.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800">{emp.name}</p>
-                    <p className="text-xs font-medium text-slate-500">{emp.post || 'Field Staff'}</p>
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100/50 px-3 py-1 rounded-full border border-emerald-200/50">Active</span>
-              </div>
-            )) : (
-              <div className="p-8 text-center text-slate-500">No recent employees found.</div>
-            )}
-          </div>
+        <div className="flex flex-col space-y-4">
+          <h3 className="text-lg font-bold text-slate-800 px-1">Recent Onboards</h3>
+          <DataTable
+            columns={[
+              { header: 'Employee', cell: (row) => <span className="font-semibold text-slate-800">{row.name}</span> },
+              { header: 'Role', accessor: 'post' },
+              { header: 'Status', cell: () => <StatusBadge status="Active" /> }
+            ]}
+            data={stats.recentEmployees || []}
+            searchable={false}
+            emptyStateTitle="No Recent Employees"
+          />
         </div>
 
         {/* Invoices */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-slate-800">Pending Invoices</h3>
-            <button className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">View All</button>
-          </div>
-          <div className="p-0">
-            {stats.recentInvoices && stats.recentInvoices.length > 0 ? stats.recentInvoices.map((inv, i) => (
-              <div key={inv.invoice_id} className={`flex items-center justify-between p-4 ${i !== stats.recentInvoices.length - 1 ? 'border-b border-slate-50' : ''} hover:bg-slate-50 transition-colors`}>
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 shadow-sm">
-                    <FileText size={18} />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800">{inv.wo_no || `INV-${inv.invoice_id}`}</p>
-                    <p className="text-xs font-medium text-slate-500">Due in 5 days</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-slate-800">₹ {parseFloat(inv.amount).toLocaleString()}</p>
-                  <p className="text-xs font-bold text-orange-600 mt-0.5">{inv.status || 'Unpaid'}</p>
-                </div>
-              </div>
-            )) : (
-              <div className="p-8 text-center text-slate-500">No pending invoices.</div>
-            )}
-          </div>
+        <div className="flex flex-col space-y-4">
+          <h3 className="text-lg font-bold text-slate-800 px-1">Pending Invoices</h3>
+          <DataTable
+            columns={[
+              { header: 'Invoice', cell: (row) => <span className="font-semibold text-slate-800">{row.wo_no || `INV-${row.invoice_id}`}</span> },
+              { header: 'Amount', cell: (row) => `₹ ${parseFloat(row.amount).toLocaleString()}` },
+              { header: 'Status', cell: (row) => <StatusBadge status={row.status || 'Unpaid'} /> }
+            ]}
+            data={stats.recentInvoices || []}
+            searchable={false}
+            emptyStateTitle="No Pending Invoices"
+          />
         </div>
 
       </div>

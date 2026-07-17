@@ -11,7 +11,10 @@ exports.getDashboardStats = async (req, res) => {
             recentEmployeesResult,
             recentInvoicesResult,
             trendDataResult,
-            siteDataResult
+            siteDataResult,
+            totalRevenueResult,
+            pendingReceivablesResult,
+            todayAttendanceResult
         ] = await Promise.all([
             db.query('SELECT COUNT(*) FROM employees'),
             db.query('SELECT COUNT(*) FROM work_orders WHERE end_date IS NULL OR end_date >= CURRENT_DATE'),
@@ -60,7 +63,10 @@ exports.getDashboardStats = async (req, res) => {
                 HAVING COUNT(DISTINCT a.employee_id) > 0
                 ORDER BY employees DESC
                 LIMIT 5
-            `)
+            `),
+            db.query('SELECT SUM(amount) FROM invoices'),
+            db.query('SELECT SUM(amount) FROM invoices WHERE status = $1 OR status = $2', ['Unpaid', 'Pending']),
+            db.query('SELECT COUNT(*) FROM attendance WHERE date = CURRENT_DATE AND status = $1', ['Present'])
         ]);
 
         const stats = {
@@ -71,7 +77,10 @@ exports.getDashboardStats = async (req, res) => {
             recentEmployees: recentEmployeesResult.rows,
             recentInvoices: recentInvoicesResult.rows,
             trendData: trendDataResult ? trendDataResult.rows : [],
-            siteData: siteDataResult ? siteDataResult.rows : []
+            siteData: siteDataResult ? siteDataResult.rows : [],
+            totalRevenue: parseFloat(totalRevenueResult.rows[0].sum || 0),
+            pendingReceivables: parseFloat(pendingReceivablesResult.rows[0].sum || 0),
+            todayAttendance: parseInt(todayAttendanceResult.rows[0].count, 10)
         };
 
         res.json(stats);

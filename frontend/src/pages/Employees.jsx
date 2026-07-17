@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, AlertCircle, X } from 'lucide-react';
 import api from '../api/axios';
+import DataTable from '../components/DataTable';
+import StatusBadge from '../components/StatusBadge';
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
@@ -139,7 +141,7 @@ const Employees = () => {
             setBankPhoto(null);
             setIsModalOpen(true);
           }}
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors shadow-sm shadow-indigo-200"
         >
           <Plus size={20} />
           <span>Add Employee</span>
@@ -153,68 +155,40 @@ const Employees = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-4 border-b border-gray-100 flex items-center bg-gray-50/50">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search employees by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-            />
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="p-4 font-semibold text-gray-600 text-sm">Name</th>
-                <th className="p-4 font-semibold text-gray-600 text-sm">Post</th>
-                <th className="p-4 font-semibold text-gray-600 text-sm">Category</th>
-                <th className="p-4 font-semibold text-gray-600 text-sm">Mobile</th>
-                <th className="p-4 font-semibold text-gray-600 text-sm text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="5" className="p-8 text-center text-gray-500">Loading employees...</td>
-                </tr>
-              ) : employees.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="p-8 text-center text-gray-500">No employees found.</td>
-                </tr>
-              ) : (
-                employees
-                  .filter(emp => emp.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                  .map((emp) => (
-                  <tr key={emp.employee_id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                    <td className="p-4 font-medium text-gray-900">{emp.name}</td>
-                    <td className="p-4 text-gray-600">{emp.post}</td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                        {emp.category}
-                      </span>
-                    </td>
-                    <td className="p-4 text-gray-600">{emp.mobile_no}</td>
-                    <td className="p-4 text-right space-x-3">
-                      <button onClick={() => handleEdit(emp)} className="text-gray-400 hover:text-primary-600 transition-colors">
-                        <Edit2 size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(emp.employee_id)} className="text-gray-400 hover:text-red-600 transition-colors">
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center p-12 text-slate-500">Loading employees...</div>
+      ) : (
+        <DataTable
+          columns={[
+            { header: 'Name', accessor: 'name' },
+            { header: 'Post', accessor: 'post' },
+            { 
+              header: 'Category', 
+              cell: (row) => <StatusBadge status={row.category} />
+            },
+            { header: 'Mobile', accessor: 'mobile_no' },
+            { 
+              header: 'Actions', 
+              cell: (row) => (
+                <div className="flex space-x-3">
+                  <button onClick={() => handleEdit(row)} className="text-slate-400 hover:text-indigo-600 transition-colors">
+                    <Edit2 size={18} />
+                  </button>
+                  <button onClick={() => handleDelete(row.employee_id)} className="text-slate-400 hover:text-rose-600 transition-colors">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ) 
+            }
+          ]}
+          data={employees}
+          searchPlaceholder="Search employees..."
+          emptyStateTitle="No Employees Found"
+          emptyStateDesc="Get started by adding your first employee to the directory."
+          emptyActionLabel="Add Employee"
+          onEmptyAction={() => setIsModalOpen(true)}
+        />
+      )}
 
       {/* Add Employee Modal */}
       {isModalOpen && (
@@ -296,7 +270,7 @@ const Employees = () => {
                   <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors">
                     Cancel
                   </button>
-                  <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={submitting} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm shadow-indigo-200 disabled:opacity-50">
                     {submitting ? 'Saving...' : (editingId ? 'Update Employee' : 'Save Employee')}
                   </button>
                 </div>

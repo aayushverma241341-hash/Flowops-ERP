@@ -6,10 +6,12 @@ import api from '../api/axios';
 import StatCard from '../components/StatCard';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
+import StatModal from '../components/StatModal';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -66,6 +68,15 @@ const Dashboard = () => {
             icon={<TrendingUp size={24} strokeWidth={2.5} />} 
             gradient="from-emerald-500 to-teal-500"
             delay={0}
+            onClick={() => setActiveModal({
+              title: "Gross Revenue (YTD)",
+              value: `₹ ${(stats.totalRevenue || 0).toLocaleString()}`,
+              icon: <TrendingUp size={32} strokeWidth={2.5} />,
+              gradient: "from-emerald-500 to-teal-500",
+              description: "Total gross revenue accumulated year-to-date from all cleared and paid invoices.",
+              actionText: "View Invoice Register",
+              actionPath: "/sap/accounts"
+            })}
           />
           <StatCard 
             title="Total Assets (GL)" 
@@ -73,6 +84,15 @@ const Dashboard = () => {
             icon={<Landmark size={24} strokeWidth={2.5} />} 
             gradient="from-indigo-500 to-blue-600"
             delay={100}
+            onClick={() => setActiveModal({
+              title: "Total Assets (GL)",
+              value: `₹ ${(stats.totalGL || 0).toLocaleString()}`,
+              icon: <Landmark size={32} strokeWidth={2.5} />,
+              gradient: "from-indigo-500 to-blue-600",
+              description: "Total cumulative debit amounts posted to the FI General Ledger across all active company codes.",
+              actionText: "Open General Ledger",
+              actionPath: "/sap/gl"
+            })}
           />
           <StatCard 
             title="Total Receivables (AR)" 
@@ -80,6 +100,15 @@ const Dashboard = () => {
             icon={<ArrowDownRight size={24} strokeWidth={2.5} />} 
             gradient="from-emerald-400 to-teal-500"
             delay={200}
+            onClick={() => setActiveModal({
+              title: "Total Receivables (AR)",
+              value: `₹ ${(stats.totalAR || 0).toLocaleString()}`,
+              icon: <ArrowDownRight size={32} strokeWidth={2.5} />,
+              gradient: "from-emerald-400 to-teal-500",
+              description: "Sum of all open, uncleared incoming payments expected from customers and debtors.",
+              actionText: "Open Accounts Receivable",
+              actionPath: "/sap/ar"
+            })}
           />
           <StatCard 
             title="Total Payables (AP)" 
@@ -87,6 +116,15 @@ const Dashboard = () => {
             icon={<ArrowUpRight size={24} strokeWidth={2.5} />} 
             gradient="from-rose-400 to-red-500"
             delay={300}
+            onClick={() => setActiveModal({
+              title: "Total Payables (AP)",
+              value: `₹ ${(stats.totalAP || 0).toLocaleString()}`,
+              icon: <ArrowUpRight size={32} strokeWidth={2.5} />,
+              gradient: "from-rose-400 to-red-500",
+              description: "Sum of all open, uncleared outgoing payments owed to vendors and creditors.",
+              actionText: "Open Accounts Payable",
+              actionPath: "/sap/ap"
+            })}
           />
         </div>
       </section>
@@ -104,6 +142,15 @@ const Dashboard = () => {
             icon={<Users size={24} strokeWidth={2.5} />} 
             gradient="from-slate-600 to-slate-800"
             delay={0}
+            onClick={() => setActiveModal({
+              title: "Total Employees",
+              value: stats.totalEmployees || 0,
+              icon: <Users size={32} strokeWidth={2.5} />,
+              gradient: "from-slate-600 to-slate-800",
+              description: "Total number of active employees registered in the HR master database.",
+              actionText: "View Employee Directory",
+              actionPath: "/employees"
+            })}
           />
           <StatCard 
             title="Attendance Today" 
@@ -111,6 +158,15 @@ const Dashboard = () => {
             icon={<CheckCircle size={24} strokeWidth={2.5} />} 
             gradient="from-blue-400 to-indigo-500"
             delay={100}
+            onClick={() => setActiveModal({
+              title: "Attendance Today",
+              value: stats.todayAttendance || 0,
+              icon: <CheckCircle size={32} strokeWidth={2.5} />,
+              gradient: "from-blue-400 to-indigo-500",
+              description: "Number of employees who have clocked in for today's shift.",
+              actionText: "View Attendance Register",
+              actionPath: "/attendance"
+            })}
           />
           <StatCard 
             title="Active Work Orders" 
@@ -118,6 +174,15 @@ const Dashboard = () => {
             icon={<Briefcase size={24} strokeWidth={2.5} />} 
             gradient="from-amber-400 to-orange-500"
             delay={200}
+            onClick={() => setActiveModal({
+              title: "Active Work Orders",
+              value: stats.activeWorkOrders || 0,
+              icon: <Briefcase size={32} strokeWidth={2.5} />,
+              gradient: "from-amber-400 to-orange-500",
+              description: "Total number of work orders and projects currently in progress.",
+              actionText: "Manage Work Orders",
+              actionPath: "/work-orders"
+            })}
           />
           <StatCard 
             title="Running Sites" 
@@ -125,6 +190,15 @@ const Dashboard = () => {
             icon={<MapPin size={24} strokeWidth={2.5} />} 
             gradient="from-fuchsia-500 to-purple-600"
             delay={300}
+            onClick={() => setActiveModal({
+              title: "Running Sites",
+              value: stats.activeSites || 0,
+              icon: <MapPin size={32} strokeWidth={2.5} />,
+              gradient: "from-fuchsia-500 to-purple-600",
+              description: "Total number of operational field sites across all locations.",
+              actionText: "View Sites",
+              actionPath: "/sites"
+            })}
           />
           <StatCard 
             title="Monthly Payroll" 
@@ -132,6 +206,15 @@ const Dashboard = () => {
             icon={<IndianRupee size={24} strokeWidth={2.5} />} 
             gradient="from-rose-400 to-red-500"
             delay={400}
+            onClick={() => setActiveModal({
+              title: "Monthly Payroll",
+              value: `₹ ${(stats.monthlyPayroll || 0).toLocaleString()}`,
+              icon: <IndianRupee size={32} strokeWidth={2.5} />,
+              gradient: "from-rose-400 to-red-500",
+              description: "Total net salary disbursed in the current monthly payroll cycle.",
+              actionText: "Process Salary",
+              actionPath: "/salary"
+            })}
           />
         </div>
       </section>
@@ -268,6 +351,13 @@ const Dashboard = () => {
 
         </div>
       </section>
+
+      {/* Dynamic Popups for Stat Cards */}
+      <StatModal 
+        isOpen={!!activeModal} 
+        onClose={() => setActiveModal(null)}
+        {...activeModal} 
+      />
 
     </div>
   );

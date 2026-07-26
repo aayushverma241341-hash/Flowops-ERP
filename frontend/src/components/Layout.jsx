@@ -4,7 +4,7 @@ import {
   Briefcase, User, ClipboardList, MapPin, Clock, FileText, 
   Package, ShoppingCart, Truck, ShoppingBag, Landmark, Search, 
   Menu, Bell, ChevronDown, ChevronRight, Warehouse, Layers, 
-  Settings, FolderKanban, ShieldCheck, CreditCard, Receipt
+  Settings, FolderKanban, ShieldCheck, CreditCard, Receipt, LogOut
 } from 'lucide-react';
 import SmartChat from './SmartChat';
 import CommandPalette from './CommandPalette';
@@ -130,6 +130,12 @@ const Layout = () => {
     }));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
+
   const isActive = (path) => {
     return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
   };
@@ -211,15 +217,35 @@ const Layout = () => {
         </div>
         
         {/* User Profile Snippet in Sidebar */}
-        <div className={`p-5 border-t border-slate-800/60 bg-[#020617]/50 flex items-center ${sidebarOpen ? 'space-x-4' : 'justify-center'}`}>
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-500/20">
-            {currentUser ? currentUser.username.charAt(0).toUpperCase() : 'A'}
+        <div className={`p-5 border-t border-slate-800/60 bg-[#020617]/50 flex items-center justify-between ${!sidebarOpen && 'flex-col space-y-4'}`}>
+          <div className={`flex items-center ${sidebarOpen ? 'space-x-4' : 'justify-center'}`}>
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-500/20">
+              {currentUser ? currentUser.username.charAt(0).toUpperCase() : 'A'}
+            </div>
+            {sidebarOpen && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white truncate">{currentUser ? currentUser.username : 'Admin User'}</p>
+                <p className="text-xs text-indigo-300 font-medium truncate mt-0.5">{currentUser ? currentUser.role : 'System Administrator'}</p>
+              </div>
+            )}
           </div>
           {sidebarOpen && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{currentUser ? currentUser.username : 'Admin User'}</p>
-              <p className="text-xs text-indigo-300 font-medium truncate mt-0.5">{currentUser ? currentUser.role : 'System Administrator'}</p>
-            </div>
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+              title="Log Out"
+            >
+              <LogOut size={18} />
+            </button>
+          )}
+          {!sidebarOpen && (
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors mt-2"
+              title="Log Out"
+            >
+              <LogOut size={18} />
+            </button>
           )}
         </div>
       </aside>

@@ -6,6 +6,7 @@ import Employees from './pages/Employees';
 import WorkOrders from './pages/WorkOrders';
 import Sites from './pages/Sites';
 import Attendance from './pages/Attendance';
+import Logout from './pages/Logout';
 import Billing from './pages/Billing';
 import Salary from './pages/Salary';
 import Search from './pages/Search';
@@ -48,6 +49,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
         
         <Route 
           path="/" 

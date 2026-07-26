@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Lock, User } from 'lucide-react';
+import { LogIn, AlertCircle } from 'lucide-react';
 import api from '../api/axios';
 
 const Login = () => {
@@ -20,107 +20,73 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/');
-      window.location.reload();
+      window.location.reload(); // Refresh to update auth state
     } catch (err) {
-      setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.');
+      setError(err.response?.data?.message || 'Failed to login. Check credentials and server status.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#354A5F] flex items-center justify-center font-sans relative">
-      
-      {/* SAP Fiori Style Background (Abstract corporate gradient) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1C2C3F] via-[#293E52] to-[#45627A] opacity-90"></div>
-      
-      {/* Subtle SAP-like background pattern */}
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
+        <img src="/flowops-logo.svg" alt="FlowOps Logo" className="h-16 w-16 mb-4 object-contain" />
+        <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
+          Sign in to FlowOps ERP
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Manage your enterprise efficiently
+        </p>
+      </div>
 
-      {/* Main Login Container */}
-      <div className="z-10 w-full max-w-[420px] bg-white rounded-sm shadow-[0_15px_35px_rgba(0,0,0,0.3)] overflow-hidden">
-        
-        {/* Header Bar */}
-        <div className="h-[6px] w-full bg-[#0a6ed1]"></div>
-
-        <div className="px-10 py-10">
-          
-          {/* Logo Section */}
-          <div className="flex flex-col items-center justify-center mb-8">
-            <h1 className="text-4xl font-bold text-[#1C2C3F] tracking-tight mb-1 font-serif">FlowOps</h1>
-            <h2 className="text-[#556B82] text-sm font-medium tracking-wide">ENTERPRISE RESOURCE PLANNING</h2>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-6">
-            
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
+          <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="bg-[#FFEBEB] border-l-4 border-[#E52929] text-[#E52929] p-3 flex items-start space-x-2 text-sm">
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <div className="bg-red-50 text-red-700 p-3 rounded-lg flex items-center space-x-2 text-sm border border-red-100">
+                <AlertCircle size={16} />
                 <span>{error}</span>
               </div>
             )}
 
-            <div className="space-y-4">
-              {/* Username Input - Fiori Style */}
-              <div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#556B82]">
-                    <User size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="User ID"
-                    className="block w-full pl-10 pr-3 py-3 border border-[#CCCCCC] rounded-sm text-[#333333] placeholder-[#888888] focus:outline-none focus:border-[#0a6ed1] focus:ring-1 focus:ring-[#0a6ed1] transition-colors text-[15px]"
-                  />
-                </div>
-              </div>
-
-              {/* Password Input - Fiori Style */}
-              <div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#556B82]">
-                    <Lock size={18} />
-                  </div>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="block w-full pl-10 pr-3 py-3 border border-[#CCCCCC] rounded-sm text-[#333333] placeholder-[#888888] focus:outline-none focus:border-[#0a6ed1] focus:ring-1 focus:ring-[#0a6ed1] transition-colors text-[15px]"
-                  />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Username</label>
+              <div className="mt-1">
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
               </div>
             </div>
 
-            {/* Login Button */}
-            <div className="pt-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="mt-1">
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-sm text-[15px] font-semibold text-white bg-[#0a6ed1] hover:bg-[#0854a0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0a6ed1] transition-colors shadow-sm disabled:opacity-60"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                {loading ? 'Authenticating...' : 'Log On'}
+                {loading ? 'Signing in...' : 'Sign in'}
+                {!loading && <LogIn className="ml-2 h-4 w-4" />}
               </button>
             </div>
-            
-            {/* Options */}
-            <div className="flex justify-between items-center pt-2">
-              <a href="#" className="text-sm text-[#0a6ed1] hover:underline">Change Password</a>
-              <a href="#" className="text-sm text-[#0a6ed1] hover:underline">Forgot Password?</a>
-            </div>
-
           </form>
-        </div>
-
-        {/* Footer */}
-        <div className="bg-[#F2F2F2] border-t border-[#E5E5E5] px-10 py-4 flex justify-between items-center text-[12px] text-[#666666]">
-          <span>© 2026 FlowOps SE</span>
-          <span>System v2.4</span>
         </div>
       </div>
     </div>

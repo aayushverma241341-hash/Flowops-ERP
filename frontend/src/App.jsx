@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import Departments from './pages/Departments';
 import Employees from './pages/Employees';
 import WorkOrders from './pages/WorkOrders';
 import Sites from './pages/Sites';
@@ -60,6 +61,7 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="departments" element={<Departments />} />
           <Route path="employees" element={<Employees />} />
           <Route path="work-orders" element={<WorkOrders />} />
           <Route path="sites" element={<Sites />} />

@@ -61,6 +61,7 @@ const Layout = () => {
       title: 'HR & Operations',
       icon: <User size={20} />,
       items: [
+        { label: 'Departments', path: '/departments' },
         { label: 'Employees', path: '/employees' },
         { label: 'Work Orders', path: '/work-orders' },
         { label: 'Sites', path: '/sites' },

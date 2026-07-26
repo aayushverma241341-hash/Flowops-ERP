@@ -17,6 +17,7 @@ const wmRoutes = require('./routes/wmRoutes');
 const ediRoutes = require('./routes/ediRoutes');
 const ppRoutes = require('./routes/ppRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const departmentRoutes = require('./routes/departmentRoutes');
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/wm', wmRoutes);
 app.use('/api/edi', ediRoutes);
 app.use('/api/pp', ppRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/departments', departmentRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

@@ -44,7 +44,9 @@ const Login = () => {
             
             {/* Logo */}
             <div className="flex items-center space-x-3 mb-10 justify-center lg:justify-start">
-              <img src="/flowops-logo.svg" alt="FlowOps Logo" className="h-12 w-12 object-contain" />
+              <div className="bg-white p-2 rounded-xl shadow-lg shadow-white/10 ring-2 ring-white/20">
+                <img src="/flowops-logo.svg" alt="FlowOps Logo" className="h-10 w-10 object-contain" />
+              </div>
               <span className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight font-heading">
                 FlowOps
               </span>

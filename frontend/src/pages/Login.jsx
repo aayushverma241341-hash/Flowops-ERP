@@ -44,9 +44,7 @@ const Login = () => {
             
             {/* Logo */}
             <div className="flex items-center space-x-3 mb-10 justify-center lg:justify-start">
-              <div className="bg-gradient-to-br from-indigo-500 to-cyan-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-500/20">
-                <FolderKanban size={28} strokeWidth={2.5} />
-              </div>
+              <img src="/flowops-logo.svg" alt="FlowOps Logo" className="h-12 w-12 object-contain" />
               <span className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight font-heading">
                 FlowOps
               </span>

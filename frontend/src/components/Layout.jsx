@@ -160,9 +160,9 @@ const Layout = () => {
       {/* Sidebar */}
       <aside className={`bg-gradient-to-b from-[#0f172a] to-[#020617] border-r border-slate-800/50 text-slate-300 flex flex-col transition-all duration-300 shadow-2xl z-20 ${sidebarOpen ? 'w-72' : 'w-20'}`}>
         <div className="h-20 flex items-center justify-center border-b border-slate-800/60 shrink-0">
-          <div className="flex items-center space-x-3 px-4 w-full">
-            <div className="bg-gradient-to-br from-indigo-500 to-cyan-500 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20">
-              <FolderKanban size={26} strokeWidth={2.5} />
+          <div className="flex items-center space-x-3 px-4 w-full justify-center">
+            <div className="bg-white p-1.5 rounded-xl shadow-lg shadow-indigo-500/10 flex items-center justify-center h-10 w-auto">
+              <img src="/flowops-logo.svg" alt="FlowOps Logo" className="h-7 w-auto" />
             </div>
             {sidebarOpen && (
               <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight font-heading">
